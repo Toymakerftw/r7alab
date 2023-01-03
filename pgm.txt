@@ -381,3 +381,185 @@ void FIRST(char c)
   }
 }
 
+##INTERMEDIATE PROGRAM
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+char infix[50],postfix[50];
+int stack[50],top = -1;
+int pop()
+{
+return(stack[top--]);
+};
+int precedence(char symbol)
+{
+switch(symbol)
+{
+case '(':
+return 0;
+case '+':
+case '-':
+return 1;
+case '*':
+case '/':
+return 2;
+case '^':
+return 3;
+default:
+return 0;
+}
+}
+void push(int symbol)
+{
+top=top+1;
+stack[top]=symbol;
+};
+void topostfix()
+{
+int i,t=0,length;
+char next;
+char symbol;
+length = strlen(infix);
+for(i=length;i>=0;i--)
+{
+infix[i+1]=infix[i];
+}
+infix[0]='(';
+infix[length+1]=')';
+printf("The infix expressiom is : %s",infix);
+for(i=0;i<=length+1;i++)
+{
+symbol=infix[i];
+switch(symbol)
+{
+case '(':
+push(symbol);
+break;
+case ')':
+while((next=pop())!='(')
+{
+postfix[t]=next;
+t++;
+}
+break;
+case '+':
+case '-':
+case '*':
+case '/':
+case '^':
+while(precedence(stack[top])>=precedence(symbol))
+{
+postfix[t++]=pop();
+}
+push(symbol);
+break;
+default:
+postfix[t]=symbol;
+t++;
+}
+}
+};
+int main()
+{
+printf("Enter the infix expression : ");
+scanf("%s",infix);
+topostfix();
+printf("\n\nThe postfix expression is : %s ",postfix);
+return 0;
+}
+
+## Constant Propagati
+#include<stdio.h>
+#include<string.h>
+#include<ctype.h>
+void input();
+void output();
+void change(int p,char *res);
+void constant();
+struct expr
+{
+char op[2],op1[5],op2[5],res[5];
+int flag;
+}arr[10];
+int n;
+void main()
+{
+input();
+constant();
+output();
+}
+void input()
+{
+int i;
+printf("\n\nEnter the maximum number of expressions : ");
+scanf("%d",&n);
+printf("\nEnter the input : \n");
+for(i=0;i<n;i++)
+{
+scanf("%s",arr[i].op);
+scanf("%s",arr[i].op1);
+scanf("%s",arr[i].op2);
+scanf("%s",arr[i].res);
+arr[i].flag=0;
+}
+}
+void constant()
+{
+int i;
+int op1,op2,res;
+char op,res1[5];
+for(i=0;i<n;i++)
+{
+if(isdigit(arr[i].op1[0]) && isdigit(arr[i].op2[0]) || strcmp(arr[i].op,"=")==0)
+/*if both digits, store them in variables*/
+{
+op1=atoi(arr[i].op1);
+op2=atoi(arr[i].op2);
+op=arr[i].op[0];
+switch(op)
+{
+case '+':
+res=op1+op2;
+break;
+case '-':
+res=op1-op2;
+break;
+case '*':
+res=op1*op2;
+break;
+case '/':
+res=op1/op2;
+break;
+case '=':
+res=op1;
+break;
+}
+sprintf(res1,"%d",res);
+arr[i].flag=1;
+change(i,res1);
+}
+}
+}
+void output()
+{
+int i=0;
+printf("\nOptimized code is : ");
+for(i=0;i<n;i++)
+{
+if(!arr[i].flag)
+{
+printf("\n%s %s %s %s",arr[i].op,arr[i].op1,arr[i].op2,arr[i].res);
+}
+}
+}
+void change(int p,char *res)
+{
+int i;
+for(i=p+1;i<n;i++)
+{
+if(strcmp(arr[p].res,arr[i].op1)==0)
+strcpy(arr[i].op1,res);
+else if(strcmp(arr[p].res,arr[i].op2)==0)
+strcpy(arr[i].op2,res);
+}
+}
